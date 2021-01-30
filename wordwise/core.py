@@ -8,9 +8,11 @@ from utils import get_all_candidates, squash
 class Extractor:
     def __init__(
         self,
+        n_gram_range=(1, 2),
         spacy_model="en_core_web_sm",
         bert_model="sentence-transformers/distilbert-base-nli-stsb-mean-tokens",
     ):
+        self.n_gram_range = n_gram_range
         self.nlp = spacy.load(spacy_model)
         self.model = AutoModel.from_pretrained(bert_model)
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
@@ -25,8 +27,8 @@ class Extractor:
         return keywords
 
     def get_candidates(self, text):
-        all_candidates = get_all_candidates(text)
         noun_phrases = self.get_noun_phrases(text)
+        all_candidates = get_all_candidates(text, self.n_gram_range)
         candidates = list(
             filter(lambda c: c in noun_phrases or len(c.split()) == 1, all_candidates)
         )
