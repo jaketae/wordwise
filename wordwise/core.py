@@ -1,4 +1,5 @@
 import spacy
+import torch
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoModel, AutoTokenizer
@@ -6,14 +7,16 @@ from transformers import AutoModel, AutoTokenizer
 
 class Extractor:
     def __init__(
-        self, text, bert_model="distilroberta-base", spacy_model="en_core_web_sm"
+        self,
+        spacy_model="en_core_web_sm",
+        bert_model="sentence-transformers/distilbert-base-nli-stsb-mean-tokens",
     ):
-        self.text = text.lower()
         self.nlp = spacy.load(spacy_model)
         self.model = AutoModel.from_pretrained(bert_model)
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
 
-    def generate(self, top_k=5):
+    def generate(self, text, top_k=5):
+        self.text = text.lower()
         candidates = self.get_candidates()
         text_embedding = self.get_embedding(self.text)
         candidate_embeddings = self.get_embedding(candidates)
@@ -43,10 +46,36 @@ class Extractor:
         all_candidates = count.get_feature_names()
         return all_candidates
 
+    @torch.no_grad()
     def get_embedding(self, source):
         if isinstance(source, str):
             source = [source]
         tokens = self.tokenizer(source, padding=True, return_tensors="pt")
-        embedding = self.model(**tokens)["pooler_output"]
+        outputs = self.model(**tokens)
+        embedding = self.parse_outputs(outputs)
         embedding = embedding.detach().numpy()
         return embedding
+
+    def _squash(self, value):
+        if value.ndim == 2:
+            return value
+        return value.mean(dim=1)
+
+    def parse_outputs(self, outputs):
+        value = None
+        if isinstance(outputs, dict):
+            outputs_keys = outputs.keys()
+            if len(outputs_keys) == 1:
+                value = tuple(outputs.values())[0]
+            else:
+                for key in ["pooler_output", "last_hidden_state"]:
+                    if key in output_keys:
+                        value = outputs[key]
+                        break
+        else:
+            try:
+                value = torch.tensor(outputs)
+            except:
+                raise ValueError(f"Unexpected `outputs` of type {outputs.__class__}")
+        return self._squash(value)
+
