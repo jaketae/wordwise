@@ -1,1 +1,1 @@
-from core import Extractor
+from wordwise.core import Extractor
