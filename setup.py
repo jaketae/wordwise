@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="wordwise",
-    version="0.0.2",
+    version="0.0.3",
     author="Jake Tae",
     author_email="jaesungtae@gmail.com",
     description="Smart and simple keyword extraction NLP pipeline",
