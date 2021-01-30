@@ -5,10 +5,13 @@ from transformers import AutoModel, AutoTokenizer
 
 
 class Extractor:
-    def __init__(self, text, model_name):
+    def __init__(
+        self, text, bert_model="distilroberta-base", spacy_model="en_core_web_sm"
+    ):
         self.text = text.lower()
-        self.model = AutoModel.from_pretrained(model_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.nlp = spacy.load(spacy_model)
+        self.model = AutoModel.from_pretrained(bert_model)
+        self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
 
     def generate(self, top_k=5):
         candidates = self.get_candidates()
@@ -27,8 +30,7 @@ class Extractor:
         return candidates
 
     def get_noun_phrases(self):
-        nlp = spacy.load("en_core_web_sm")
-        parsed_text = nlp(self.text)
+        parsed_text = self.nlp(self.text)
         noun_phrases = set(chunk.text.strip() for chunk in parsed_text.noun_chunks)
         return noun_phrases
 
