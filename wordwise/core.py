@@ -27,17 +27,19 @@ class Extractor:
         return keywords
 
     def get_candidates(self, text):
-        noun_phrases = self.get_noun_phrases(text)
+        nouns = self.get_nouns(text)
         all_candidates = get_all_candidates(text, self.n_gram_range)
-        candidates = list(
-            filter(lambda c: c in noun_phrases or len(c.split()) == 1, all_candidates)
-        )
+        candidates = list(filter(lambda candidate: candidate in nouns, all_candidates))
         return candidates
 
-    def get_noun_phrases(self, text):
-        parsed = self.nlp(text)
-        noun_phrases = set(chunk.text.strip() for chunk in parsed.noun_chunks)
-        return noun_phrases
+    def get_nouns(self, text):
+        doc = self.nlp(text)
+        nouns = set()
+        for token in doc:
+            if token.pos_ == "NOUN":
+                nouns.add(token.text)
+        noun_phrases = set(chunk.text.strip() for chunk in doc.noun_chunks)
+        return nouns.union(noun_phrases)
 
     @torch.no_grad()
     def get_embedding(self, source):
@@ -60,6 +62,6 @@ class Extractor:
                     value = outputs[key]
                     break
         if value is None:
-            raise RuntimeError("no matching keys found for `outputs`")
+            raise RuntimeError("no matching BERT keys found for `outputs`")
         return squash(value)
 
