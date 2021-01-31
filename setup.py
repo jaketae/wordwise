@@ -8,7 +8,7 @@ setup(
     version="0.0.3",
     author="Jake Tae",
     author_email="jaesungtae@gmail.com",
-    description="Smart and simple keyword extraction NLP pipeline",
+    description="Keyword extraction using transformer-based language models",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/jaketae/keyword",
