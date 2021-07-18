@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="wordwise",
-    version="0.0.3",
+    version="0.0.4",
     author="Jake Tae",
     author_email="jaesungtae@gmail.com",
     description="Keyword extraction using transformer-based language models",

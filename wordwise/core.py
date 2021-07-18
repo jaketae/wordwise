@@ -2,7 +2,7 @@ import spacy
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoModel, AutoTokenizer
-from utils import get_all_candidates, squash
+from wordwise.utils import get_all_candidates, squash
 
 
 class Extractor:
