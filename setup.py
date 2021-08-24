@@ -3,6 +3,9 @@ from setuptools import find_packages, setup
 with open("README.md", "r") as f:
     long_description = f.read()
 
+with open("requirements.txt", "r") as f:
+    requirements = f.read().splitlines()
+
 setup(
     name="wordwise",
     version="0.0.4",
@@ -22,5 +25,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    install_requires=["transformers", "spacy", "scikit-learn"],
+    install_requires=requirements,
 )
