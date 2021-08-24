@@ -14,8 +14,11 @@ style: # Format source code automatically
 clean:
 	rm -r build dist wordwise.egg-info
 
-release:
+build:
 	python setup.py sdist bdist_wheel
 
 beta:
 	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+publish:
+	twine upload dist/*
