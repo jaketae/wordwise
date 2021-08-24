@@ -1,1 +1,1 @@
-from wordwise.core import Extractor
+from wordwise.core import Extractor  # noqa: F401
