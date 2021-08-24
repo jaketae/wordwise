@@ -4,8 +4,8 @@ import spacy
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoModel, AutoTokenizer
-from .utils import get_all_candidates, squash
 
+from .utils import get_all_candidates, squash
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class Extractor:
             self.nlp = spacy.load(spacy_model)
         except OSError:
             logger.error(
-                f"Can't find spaCy model {spacy_model}.\n"\
+                f"Can't find spaCy model {spacy_model}.\n"
                 f"Have you run `python -m spacy download {spacy_model}`?"
             )
             raise
@@ -70,10 +70,9 @@ class Extractor:
             value = tuple(outputs.values())[0]
         else:
             for key in ["pooler_output", "last_hidden_state"]:
-                if key in output_keys:
+                if key in outputs_keys:
                     value = outputs[key]
                     break
         if value is None:
             raise RuntimeError("no matching BERT keys found for `outputs`")
         return squash(value)
-
