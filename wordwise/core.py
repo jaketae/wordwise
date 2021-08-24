@@ -1,8 +1,13 @@
+import logging
+
 import spacy
 import torch
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoModel, AutoTokenizer
-from wordwise.utils import get_all_candidates, squash
+from .utils import get_all_candidates, squash
+
+
+logger = logging.getLogger(__name__)
 
 
 class Extractor:
@@ -13,7 +18,14 @@ class Extractor:
         bert_model="sentence-transformers/distilbert-base-nli-stsb-mean-tokens",
     ):
         self.n_gram_range = n_gram_range
-        self.nlp = spacy.load(spacy_model)
+        try:
+            self.nlp = spacy.load(spacy_model)
+        except OSError:
+            logger.error(
+                f"Can't find spaCy model {spacy_model}.\n"\
+                f"Have you run `python -m spacy download {spacy_model}`?"
+            )
+            raise
         self.model = AutoModel.from_pretrained(bert_model)
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
 
