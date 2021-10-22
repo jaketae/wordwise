@@ -15,7 +15,7 @@ class Extractor:
         self,
         n_gram_range=(1, 2),
         spacy_model="en_core_web_sm",
-        bert_model="sentence-transformers/distilbert-base-nli-stsb-mean-tokens",
+        bert_model="sentence-transformers/all-MiniLM-L12-v2",
     ):
         self.n_gram_range = n_gram_range
         try:
