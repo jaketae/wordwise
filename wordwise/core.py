@@ -57,13 +57,7 @@ class Extractor:
     def get_embedding(self, source):
         if isinstance(source, str):
             source = [source]
-        tokens = self.tokenizer(
-            source,
-            padding=True,
-            truncation=True,
-            max_length=self.tokenizer.model_max_length,
-            return_tensors="pt",
-        )
+        tokens = self.tokenizer(source, padding=True, return_tensors="pt")
         outputs = self.model(**tokens, return_dict=True)
         embedding = self.parse_outputs(outputs)
         embedding = embedding.detach().numpy()
