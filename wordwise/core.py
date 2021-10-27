@@ -29,7 +29,6 @@ class Extractor:
             raise
         self.device = torch.device(device)
         self.model = AutoModel.from_pretrained(bert_model).to(self.device)
-        self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
 
     def generate(self, text, top_k=5):
