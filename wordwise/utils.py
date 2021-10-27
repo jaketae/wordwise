@@ -11,7 +11,6 @@ def squash(value):
 
 
 def get_all_candidates(text, n_gram_range):
-    stop_words = "english"
-    count = CountVectorizer(ngram_range=n_gram_range, stop_words=stop_words).fit([text])
-    all_candidates = count.get_feature_names()
+    count = CountVectorizer(ngram_range=n_gram_range, stop_words="english").fit([text])
+    all_candidates = count.get_feature_names_out()
     return all_candidates
