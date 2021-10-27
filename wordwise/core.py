@@ -2,7 +2,7 @@ import logging
 
 import spacy
 import torch
-from sklearn.metrics.pairwise import cosine_similarity
+from torch.nn import functional as F
 from transformers import AutoModel, AutoTokenizer
 
 from .utils import get_all_candidates, squash
@@ -16,6 +16,7 @@ class Extractor:
         n_gram_range=(1, 2),
         spacy_model="en_core_web_sm",
         bert_model="sentence-transformers/all-MiniLM-L12-v2",
+        device="cpu",
     ):
         self.n_gram_range = n_gram_range
         try:
@@ -26,16 +27,25 @@ class Extractor:
                 f"Have you run `python -m spacy download {spacy_model}`?"
             )
             raise
-        self.model = AutoModel.from_pretrained(bert_model)
+        self.device = torch.device(device)
+        self.model = AutoModel.from_pretrained(bert_model).to(self.device)
+        self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model)
 
     def generate(self, text, top_k=5):
-        text = text.lower()
         candidates = self.get_candidates(text)
         text_embedding = self.get_embedding(text)
         candidate_embeddings = self.get_embedding(candidates)
-        distances = cosine_similarity(text_embedding, candidate_embeddings)
-        keywords = [candidates[index] for index in distances.argsort()[0][-top_k:]]
+        distances = F.cosine_similarity(
+            text_embedding.unsqueeze(1), candidate_embeddings, dim=-1
+        ).squeeze()
+        if top_k > len(distances):
+            logger.warn(
+                "`top_k` has been adjusted because it is larger than the number of candidates"
+            )
+            top_k = min(top_k, len(distances))
+        _, indicies = torch.topk(distances, k=top_k)
+        keywords = [candidates[index] for index in indicies]
         return keywords
 
     def get_candidates(self, text):
@@ -46,10 +56,7 @@ class Extractor:
 
     def get_nouns(self, text):
         doc = self.nlp(text)
-        nouns = set()
-        for token in doc:
-            if token.pos_ == "NOUN":
-                nouns.add(token.text)
+        nouns = set(token.text for token in doc if token.pos_ == "NOUN")
         noun_phrases = set(chunk.text.strip() for chunk in doc.noun_chunks)
         return nouns.union(noun_phrases)
 
@@ -63,10 +70,9 @@ class Extractor:
             truncation=True,
             max_length=self.tokenizer.model_max_length,
             return_tensors="pt",
-        )
+        ).to(self.device)
         outputs = self.model(**tokens, return_dict=True)
         embedding = self.parse_outputs(outputs)
-        embedding = embedding.detach().numpy()
         return embedding
 
     def parse_outputs(self, outputs):
@@ -75,10 +81,15 @@ class Extractor:
         if len(outputs_keys) == 1:
             value = tuple(outputs.values())[0]
         else:
-            for key in ["pooler_output", "last_hidden_state"]:
+            for key in {"pooler_output", "last_hidden_state"}:
                 if key in outputs_keys:
                     value = outputs[key]
                     break
         if value is None:
-            raise RuntimeError("no matching BERT keys found for `outputs`")
+            raise RuntimeError(
+                (
+                    "No matching BERT keys found from model output. "
+                    "Please make sure that the transformer model is BERT-based."
+                )
+            )
         return squash(value)
