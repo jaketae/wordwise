@@ -46,20 +46,20 @@ Below is an example text adapted from the [Wikipedia article on supervised learn
 
 ```python
 text = """
-         Supervised learning is the machine learning task of 
-         learning a function that maps an input to an output based 
-         on example input-output pairs.[1] It infers a function 
-         from labeled training data consisting of a set of 
-         training examples.[2] In supervised learning, each 
-         example is a pair consisting of an input object 
-         (typically a vector) and a desired output value (also 
-         called the supervisory signal). A supervised learning 
-         algorithm analyzes the training data and produces an 
-         inferred function, which can be used for mapping new 
-         examples. An optimal scenario will allow for the algorithm 
-         to correctly determine the class labels for unseen 
-         instances. This requires the learning algorithm to  
-         generalize from the training data to unseen situations 
+         Supervised learning is the machine learning task of
+         learning a function that maps an input to an output based
+         on example input-output pairs.[1] It infers a function
+         from labeled training data consisting of a set of
+         training examples.[2] In supervised learning, each
+         example is a pair consisting of an input object
+         (typically a vector) and a desired output value (also
+         called the supervisory signal). A supervised learning
+         algorithm analyzes the training data and produces an
+         inferred function, which can be used for mapping new
+         examples. An optimal scenario will allow for the algorithm
+         to correctly determine the class labels for unseen
+         instances. This requires the learning algorithm to
+         generalize from the training data to unseen situations
          in a 'reasonable' way (see inductive bias).
       """
 ```
@@ -76,17 +76,13 @@ The extractor selects the three most relevant keywords from the block of text.
 
 ## How it Works
 
-Using spaCy, the `Extractor` object generates n-gram candidate noun phrases from the provided block of text. By default, it only considers uni-grams or bi-grams, since only rarely are keywords go beyond three words. Then, using a BERT model, it generates contextual embeddings for both the provided text and the n-gram keywords. Using cosine similarity as a distance function, it extracts the `top_k` candidate keywords that are most similar to the embedding of the inputted text. 
+Using spaCy, the `Extractor` object generates n-gram candidate noun phrases from the provided block of text. By default, it only considers uni-grams or bi-grams, since only rarely are keywords go beyond three words. Then, using a BERT model, it generates contextual embeddings for both the provided text and the n-gram keywords. Using cosine similarity as a distance function, it extracts the `top_k` candidate keywords that are most similar to the embedding of the inputted text.
 
 For a more detailed write-up, please refer to my blog post [here](https://jaketae.github.io/study/keyword-extraction/).
 
-## Work in Progress
-
-WordWise will soon integrate abstractions for zero-shot text classification to generate even more reliable, semantically intact keywords that accurately capture the meaning of text. For more information, refer to [this blog post](https://jaketae.github.io/study/zero-shot-classification/).
-
 ## Credit
 
-WordWise was largely inspired by [KeyBERT](https://github.com/MaartenGr/KeyBERT), a library that similarly uses sentence embeddings for keyword extraction. WordWise also relies on NLP libraries, such as [spaCy](https://spacy.io) and [HuggingFace transformers](https://huggingface.co/transformers/), without which its development would not have been possible. 
+WordWise was largely inspired by [KeyBERT](https://github.com/MaartenGr/KeyBERT), a library that similarly uses sentence embeddings for keyword extraction. WordWise also relies on NLP libraries, such as [spaCy](https://spacy.io) and [HuggingFace transformers](https://huggingface.co/transformers/), without which its development would not have been possible.
 
 ## License
 
