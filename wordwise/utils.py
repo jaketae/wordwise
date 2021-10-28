@@ -14,3 +14,11 @@ def get_all_candidates(text, n_gram_range):
     count = CountVectorizer(ngram_range=n_gram_range, stop_words="english").fit([text])
     all_candidates = count.get_feature_names_out()
     return all_candidates
+
+
+def torch_fast_mode():
+    """use `torch.inference_mode()` if torch version is high enough"""
+    try:
+        return torch.inference_mode()
+    except AttributeError:
+        return torch.no_grad()

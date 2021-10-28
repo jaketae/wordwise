@@ -5,7 +5,7 @@ import torch
 from torch.nn import functional as F
 from transformers import AutoModel, AutoTokenizer
 
-from .utils import get_all_candidates, squash
+from .utils import get_all_candidates, squash, torch_fast_mode
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class Extractor:
         noun_phrases = set(chunk.text.strip() for chunk in doc.noun_chunks)
         return nouns.union(noun_phrases)
 
-    @torch.no_grad()
+    @torch_fast_mode()
     def get_embedding(self, source):
         if isinstance(source, str):
             source = [source]
