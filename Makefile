@@ -1,6 +1,6 @@
 .PHONY: quality style clean release beta
 
-check_dirs := wordwise
+check_dirs := wordwise tests
 
 quality: # Check that source code meets quality standards
 	black --check $(check_dirs)
